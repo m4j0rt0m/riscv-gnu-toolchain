@@ -1,7 +1,57 @@
 RISC-V GNU Compiler Toolchain
 =============================
 
-[![Build Status](https://travis-ci.org/riscv/riscv-gnu-toolchain.svg?branch=master)](https://travis-ci.org/riscv/riscv-gnu-toolchain)
+---
+
+This is a GCC 9.4 snapshot supporting the draft [RVV 0.7.1](https://github.com/brucehoult/riscv-v-spec/tree/0.7.1) specification.
+
+The support in this release is primarily in binutils, with gcc knowing how to pass the
+correct flags through, thus allowing the `gcc` driver to assemble `.s` files using RVV 0.7.1,
+or to use inline asm in C.
+
+There is no support for C intrinsics or auto-vectorisation.
+
+This draft version 0.7.1 of RVV has been implemented by THead in their C906 and C910/C920
+cores and widely sold in SoCs including the AllWinner D1, Bouffalo BL808, Cvitek CV1800B,
+Sophgo SG2002 and SG2042, THead TH1520.
+
+Use this toolchain if you want to write RVV 0.7.1 assembly language or inline asm using
+the original 0.7.1 mnemonics. If you wish, you can create an object file or library and link it with
+C/C++ code compiled by a later version of GCC or Clang.
+
+If you are writing asm by hand, there is no disadvantage to using this slightly old toolchain.
+
+GCC 14 and later support the RVV 0.7.1 draft spec under the name _xtheadvector. Technically it is the
+same, but you have to prefix instruction and CSR mnemonics with `th.`.  You can also generate
+RVV 0.7.1 code from the same C instrinsics as for 1.0.
+
+If you want to use C intrinsics for RVV 0.7.1 then use standard upstream GCC 14 or later, and add
+`_xtheadvector` to your ISA specification instead of `v`.
+
+Quickstart for a 64 bit newlib toolchain for building embedded RVV-enabled programs (or just `.o` files)
+on a Debian/Ubuntu or similar system:
+
+    sudo mkdir /opt/rvv071
+    sudo chown `whoami` /opt/rvv071
+    export PATH=/opt/rvv071/bin:$PATH
+    sudo apt update
+    sudo apt install -y autoconf automake autotools-dev bc bison \
+      build-essential coreutils curl flex gawk gcc git gperf \
+      libexpat-dev libgmp-dev libmpc-dev libmpfr-dev libtool \
+      patchutils pkg-config python3 texinfo zlib1g-dev
+    git clone https://github.com/brucehoult/riscv-gnu-toolchain
+    cd riscv-gnu-toolchain
+    git submodule update --init --recursive --depth 1 \
+      riscv-newlib riscv-binutils riscv-gcc riscv-gdb
+    ./configure --prefix=/opt/rvv071 --with-arch=rv64gcv
+    make -j`nproc` newlib
+
+Your riscv64-unknown-elf-gcc (and friends) is ready!
+
+If you don't want/need sudo to run commands as root, or don't have sudo installed, you can
+`alias sudo=''` before the above commands.
+
+---
 
 This is the RISC-V C and C++ cross-compiler. It supports two build modes:
 a generic ELF/Newlib toolchain and a more sophisticated Linux-ELF/glibc
@@ -11,11 +61,11 @@ toolchain.
 
 This repository uses submodules. You need the --recursive option to fetch the submodules automatically
 
-    $ git clone --recursive https://github.com/riscv/riscv-gnu-toolchain
+    $ git clone --recursive https://github.com/brucehoult/riscv-gnu-toolchain
     
 Alternatively :
 
-    $ git clone https://github.com/riscv/riscv-gnu-toolchain
+    $ git clone https://github.com/brucehoult/riscv-gnu-toolchain
     $ cd riscv-gnu-toolchain
     $ git submodule update --init --recursive
     
